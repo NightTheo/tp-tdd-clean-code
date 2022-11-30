@@ -49,6 +49,8 @@ class DrivingLicenceCreatorServiceTest {
         final var actual = creatorService.create(socialSecurityNumber);
 
         assertThat(actual).isEqualTo(mockDrivingLicence);
+        assertThat(actual.getAvailablePoints()).isEqualTo(12);
+
         verify(database).save(id, mockDrivingLicence);
         verifyNoMoreInteractions(database);
         verify(idGenerationService).generateNewDrivingLicenceId();
