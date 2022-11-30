@@ -41,6 +41,13 @@ class DrivingLicenceFinderServiceTest {
 
     @Test
     void should_not_find() {
+        UUID id = UUID.randomUUID();
+        when(database.findById(id)).thenReturn(Optional.empty());
 
+        final var notFound = service.findById(id);
+
+        assertThat(notFound).isEmpty();
+        verify(database).findById(id);
+        verifyNoMoreInteractions(database);
     }
 }
