@@ -14,7 +14,7 @@ class SocialSecurityNumberValidatorTest {
 
         var e = assertThrows(
                 InvalidDriverSocialSecurityNumberException.class,
-                () -> validator.validate(DrivingLicence.builder().driverSocialSecurityNumber(null).build())
+                () -> validator.validate(null)
         );
 
         assertEquals("Driver social security number should not be null", e.getMessage());
@@ -26,7 +26,7 @@ class SocialSecurityNumberValidatorTest {
 
         var e = assertThrows(
                 InvalidDriverSocialSecurityNumberException.class,
-                () -> validator.validate(DrivingLicence.builder().driverSocialSecurityNumber("12345678901234A").build())
+                () -> validator.validate("12345678901234A")
         );
 
         assertEquals("Driver social security number should contain only digits", e.getMessage());
@@ -38,14 +38,14 @@ class SocialSecurityNumberValidatorTest {
 
         var eAbove15 = assertThrows(
                 InvalidDriverSocialSecurityNumberException.class,
-                () -> validator.validate(DrivingLicence.builder().driverSocialSecurityNumber("1234567890123456").build())
+                () -> validator.validate("1234567890123456")
         );
 
         assertEquals("Driver social security number should contain 15 digits", eAbove15.getMessage());
 
         var eUnder15 = assertThrows(
                 InvalidDriverSocialSecurityNumberException.class,
-                () -> validator.validate(DrivingLicence.builder().driverSocialSecurityNumber("12345678901234").build())
+                () -> validator.validate("12345678901234")
         );
 
         assertEquals("Driver social security number should contain 15 digits", eUnder15.getMessage());
@@ -55,8 +55,6 @@ class SocialSecurityNumberValidatorTest {
     void should_validate() {
         final var validator = new SocialSecurityNumberValidator();
 
-        assertDoesNotThrow(() -> validator.validate(
-                DrivingLicence.builder().driverSocialSecurityNumber("123456789012345").build())
-        );
+        assertDoesNotThrow(() -> validator.validate("123456789012345"));
     }
 }

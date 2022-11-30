@@ -7,8 +7,7 @@ import java.util.Objects;
 
 public class SocialSecurityNumberValidator {
 
-    public void validate(DrivingLicence drivingLicence) {
-        final var socialSecurityNumber = drivingLicence.getDriverSocialSecurityNumber();
+    public void validate(String socialSecurityNumber) {
         if(Objects.isNull(socialSecurityNumber)){
             throw new InvalidDriverSocialSecurityNumberException("Driver social security number should not be null");
         }
