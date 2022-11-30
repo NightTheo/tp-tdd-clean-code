@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class InMemoryDatabase {
+public final class InMemoryDatabase{
 
     private static InMemoryDatabase INSTANCE;
     private static final java.util.Map<UUID, DrivingLicence> IN_MEMORY_DATABASE = new ConcurrentHashMap<>();
