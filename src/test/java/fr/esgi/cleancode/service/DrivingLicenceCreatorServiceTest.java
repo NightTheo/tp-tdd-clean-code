@@ -4,6 +4,7 @@ import fr.esgi.cleancode.database.InMemoryDatabase;
 import fr.esgi.cleancode.exception.InvalidDriverSocialSecurityNumberException;
 import fr.esgi.cleancode.model.DrivingLicence;
 import fr.esgi.cleancode.service.validation.SocialSecurityNumberValidator;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
+import static io.vavr.API.Left;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -48,8 +50,8 @@ class DrivingLicenceCreatorServiceTest {
 
         final var actual = creatorService.create(socialSecurityNumber);
 
-        assertThat(actual).isEqualTo(mockDrivingLicence);
-        assertThat(actual.getAvailablePoints()).isEqualTo(12);
+        assertThat(actual).contains(mockDrivingLicence);
+        assertThat(actual.get().getAvailablePoints()).isEqualTo(12);
 
         verify(database).save(id, mockDrivingLicence);
         verifyNoMoreInteractions(database);
@@ -61,13 +63,14 @@ class DrivingLicenceCreatorServiceTest {
 
     @Test
     void should_not_create() {
-        final var socialSecurityNumber = "12345";
+        final var invalidSocialSecurityNumber = "12345";
 
         doThrow(InvalidDriverSocialSecurityNumberException.class).when(socialSecurityNumberValidator).validate(anyString());
 
-        assertThrows(InvalidDriverSocialSecurityNumberException.class, () -> creatorService.create(socialSecurityNumber));
+        final var returned = creatorService.create(invalidSocialSecurityNumber);
+        assertThat(returned.getLeft()).isInstanceOf(InvalidDriverSocialSecurityNumberException.class);
 
-        verify(socialSecurityNumberValidator).validate(socialSecurityNumber);
+        verify(socialSecurityNumberValidator).validate(invalidSocialSecurityNumber);
         verifyNoInteractions(database);
         verifyNoInteractions(idGenerationService);
     }

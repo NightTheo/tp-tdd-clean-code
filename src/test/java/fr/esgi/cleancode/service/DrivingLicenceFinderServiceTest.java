@@ -33,7 +33,6 @@ class DrivingLicenceFinderServiceTest {
         when(database.findById(id)).thenReturn(Optional.of(drivingLicence));
 
         final var found = service.findById(id);
-        assertThat(found).isPresent();
         assertThat(found).containsSame(drivingLicence);
         verify(database).findById(id);
         verifyNoMoreInteractions(database);
