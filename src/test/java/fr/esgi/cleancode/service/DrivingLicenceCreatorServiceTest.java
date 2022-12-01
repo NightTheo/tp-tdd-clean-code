@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static io.vavr.API.Left;
+import static io.vavr.API.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -46,7 +46,8 @@ class DrivingLicenceCreatorServiceTest {
 
         when(idGenerationService.generateNewDrivingLicenceId()).thenReturn(id);
         when(database.save(eq(id), any(DrivingLicence.class))).thenReturn(mockDrivingLicence);
-        doNothing().when(socialSecurityNumberValidator).validate(socialSecurityNumber);
+        when(socialSecurityNumberValidator.validate(socialSecurityNumber))
+                .thenReturn(Valid(socialSecurityNumber));
 
         final var actual = creatorService.create(socialSecurityNumber);
 
@@ -65,7 +66,8 @@ class DrivingLicenceCreatorServiceTest {
     void should_not_create() {
         final var invalidSocialSecurityNumber = "12345";
 
-        doThrow(InvalidDriverSocialSecurityNumberException.class).when(socialSecurityNumberValidator).validate(anyString());
+        when(socialSecurityNumberValidator.validate(anyString()))
+                .thenReturn(Invalid(new InvalidDriverSocialSecurityNumberException("")));
 
         final var returned = creatorService.create(invalidSocialSecurityNumber);
         assertThat(returned.getLeft()).isInstanceOf(InvalidDriverSocialSecurityNumberException.class);

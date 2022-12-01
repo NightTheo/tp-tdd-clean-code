@@ -2,22 +2,28 @@ package fr.esgi.cleancode.service.validation;
 
 import fr.esgi.cleancode.exception.InvalidDriverSocialSecurityNumberException;
 import fr.esgi.cleancode.model.DrivingLicence;
+import io.vavr.control.Validation;
 
 import java.util.Objects;
 
+import static io.vavr.API.Invalid;
+import static io.vavr.API.Valid;
+
 public class SocialSecurityNumberValidator {
 
-    public void validate(String socialSecurityNumber) throws InvalidDriverSocialSecurityNumberException {
+    public Validation<InvalidDriverSocialSecurityNumberException, String> validate(String socialSecurityNumber) throws InvalidDriverSocialSecurityNumberException {
         if(Objects.isNull(socialSecurityNumber)){
-            throw new InvalidDriverSocialSecurityNumberException("Driver social security number should not be null");
+            return Invalid(new InvalidDriverSocialSecurityNumberException("Driver social security number should not be null"));
         }
 
         if(!socialSecurityNumber.matches("\\d+")) {
-            throw new InvalidDriverSocialSecurityNumberException("Driver social security number should contain only digits");
+            return Invalid(new InvalidDriverSocialSecurityNumberException("Driver social security number should contain only digits"));
         }
 
         if(socialSecurityNumber.length() != 15) {
-            throw new InvalidDriverSocialSecurityNumberException("Driver social security number should contain 15 digits");
+            return Invalid(new InvalidDriverSocialSecurityNumberException("Driver social security number should contain 15 digits"));
         }
+
+        return Valid(socialSecurityNumber);
     }
 }

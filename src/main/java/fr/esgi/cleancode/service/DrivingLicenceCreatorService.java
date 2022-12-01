@@ -15,17 +15,19 @@ public class DrivingLicenceCreatorService {
     private final SocialSecurityNumberValidator socialSecurityNumberValidator;
 
     public Either<InvalidDriverSocialSecurityNumberException, DrivingLicence> create(String socialSecurityNumber) {
-        try {
-            socialSecurityNumberValidator.validate(socialSecurityNumber);
-        } catch (InvalidDriverSocialSecurityNumberException e) {
-            return Either.left(new InvalidDriverSocialSecurityNumberException(e.getMessage()));
-        }
-        final var drivingLicence  = DrivingLicence
-                .builder()
-                .id(drivingLicenceIdGenerationService.generateNewDrivingLicenceId())
-                .driverSocialSecurityNumber(socialSecurityNumber)
-                .build();
 
-        return Either.right(database.save(drivingLicence.getId(), drivingLicence));
+        final var socialSecurityNumberValidation = socialSecurityNumberValidator.validate(socialSecurityNumber);
+
+        if (socialSecurityNumberValidation.isValid()) {
+            final var drivingLicence  = DrivingLicence
+                    .builder()
+                    .id(drivingLicenceIdGenerationService.generateNewDrivingLicenceId())
+                    .driverSocialSecurityNumber(socialSecurityNumber)
+                    .build();
+
+            return Either.right(database.save(drivingLicence.getId(), drivingLicence));
+        }
+
+        return Either.left(socialSecurityNumberValidation.getError());
     }
 }

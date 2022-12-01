@@ -1,9 +1,11 @@
 package fr.esgi.cleancode.service.validation;
 
 import fr.esgi.cleancode.exception.InvalidDriverSocialSecurityNumberException;
-import fr.esgi.cleancode.model.DrivingLicence;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.assertj.vavr.api.VavrAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SocialSecurityNumberValidatorTest {
@@ -12,49 +14,37 @@ class SocialSecurityNumberValidatorTest {
     void should_not_be_null() {
         final var validator = new SocialSecurityNumberValidator();
 
-        var e = assertThrows(
-                InvalidDriverSocialSecurityNumberException.class,
-                () -> validator.validate(null)
-        );
+        final var invalid = validator.validate(null);
 
-        assertEquals("Driver social security number should not be null", e.getMessage());
+        assertThat(invalid).containsInvalidInstanceOf(InvalidDriverSocialSecurityNumberException.class);
+        assertEquals("Driver social security number should not be null", invalid.getError().getMessage());
     }
 
     @Test
     void should_contain_only_digits() {
         final var validator = new SocialSecurityNumberValidator();
 
-        var e = assertThrows(
-                InvalidDriverSocialSecurityNumberException.class,
-                () -> validator.validate("12345678901234A")
-        );
+        final var invalid = validator.validate("12345678901234A");
 
-        assertEquals("Driver social security number should contain only digits", e.getMessage());
+        assertThat(invalid).containsInvalidInstanceOf(InvalidDriverSocialSecurityNumberException.class);
+        assertEquals("Driver social security number should contain only digits", invalid.getError().getMessage());
     }
 
-    @Test
-    void should_have_a_length_of_15() {
+    @ParameterizedTest
+    @ValueSource(strings = {"12345678901234", "1234567890123456"})
+    void should_have_a_length_of_15(String invalidLengthSocialSecurityNumber) {
         final var validator = new SocialSecurityNumberValidator();
 
-        var eAbove15 = assertThrows(
-                InvalidDriverSocialSecurityNumberException.class,
-                () -> validator.validate("1234567890123456")
-        );
+        final var invalid = validator.validate(invalidLengthSocialSecurityNumber);
 
-        assertEquals("Driver social security number should contain 15 digits", eAbove15.getMessage());
-
-        var eUnder15 = assertThrows(
-                InvalidDriverSocialSecurityNumberException.class,
-                () -> validator.validate("12345678901234")
-        );
-
-        assertEquals("Driver social security number should contain 15 digits", eUnder15.getMessage());
+        assertThat(invalid).containsInvalidInstanceOf(InvalidDriverSocialSecurityNumberException.class);
+        assertEquals("Driver social security number should contain 15 digits", invalid.getError().getMessage());
     }
 
     @Test
     void should_validate() {
         final var validator = new SocialSecurityNumberValidator();
 
-        assertDoesNotThrow(() -> validator.validate("123456789012345"));
+        assertThat(validator.validate("123456789012345")).containsValid("123456789012345");
     }
 }
