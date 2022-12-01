@@ -4,10 +4,12 @@ import fr.esgi.cleancode.database.InMemoryDatabase;
 import fr.esgi.cleancode.exception.ResourceNotFoundException;
 import fr.esgi.cleancode.model.DrivingLicence;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class DrivingLicencePointRemoverServiceTest {
 
     @InjectMocks
@@ -46,7 +49,7 @@ class DrivingLicencePointRemoverServiceTest {
         assertThat(modified.getAvailablePoints()).isEqualTo(initialPoints - pointsToRemove);
 
         verify(database).findById(id);
-        verify(database).save(id, any(DrivingLicence.class));
+        verify(database).save(eq(id), any(DrivingLicence.class));
         verifyNoMoreInteractions(database);
     }
 
@@ -55,12 +58,12 @@ class DrivingLicencePointRemoverServiceTest {
     void should_throw_ResourceNotFoundException_if_not_found() {
         final var id = UUID.randomUUID();
 
-        when(database.findById(any(UUID.class))).thenReturn(Optional.empty());
+        when(database.findById(id)).thenReturn(Optional.empty());
 
         final var e = assertThrows(ResourceNotFoundException.class,
                 ()->drivingLicencePointRemoverService.remove(id, 10));
 
-        assertThat(e.getMessage()).isEqualTo("No such Drinving Licence " + id);
+        assertThat(e.getMessage()).isEqualTo("No such Driving Licence " + id);
 
         verify(database).findById(id);
         verifyNoMoreInteractions(database);
@@ -86,7 +89,7 @@ class DrivingLicencePointRemoverServiceTest {
         assertThat(modified.getAvailablePoints()).isEqualTo(0);
 
         verify(database).findById(id);
-        verify(database).save(id, any(DrivingLicence.class));
+        verify(database).save(eq(id), any(DrivingLicence.class));
         verifyNoMoreInteractions(database);
     }
 
